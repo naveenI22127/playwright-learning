@@ -1,0 +1,17 @@
+{
+  "name": "playwrightdemo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@types/node": "^24.0.1"
+  },
+  "dependencies": {
+    "csv-parse": "^5.6.0"
+  }
+}
