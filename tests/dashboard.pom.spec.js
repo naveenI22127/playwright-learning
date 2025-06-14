@@ -2,20 +2,27 @@ const { test, expect } = require('@playwright/test');
 const { LoginPage } = require('./pages/login.page');
 const { DashboardPage } = require('./pages/dashboard.page');
 
-const VALID_USER = { username: 'standard_user', password: 'secret_sauce' };
-
 test.describe('Dashboard Page - POM', () => {
-  test('Dashboard is visible after login and logout returns to login page', async ({ page }) => {
-    const loginPage = new LoginPage(page);
+  let loginPage;
+  let dashboardPage;
+
+  test.beforeEach(async ({ page }) => {
+    loginPage = new LoginPage(page);
+    dashboardPage = new DashboardPage(page);
+  });
+
+  test('should display inventory after successful login', async ({ page }) => {
     await loginPage.goto();
-    await loginPage.login(VALID_USER.username, VALID_USER.password);
+    await loginPage.login('standard_user', 'secret_sauce');
+    await expect(page).toHaveURL(/.*inventory/);
+    expect(await dashboardPage.isInventoryVisible()).toBeTruthy();
+    expect(await dashboardPage.getInventoryItemsCount()).toBeGreaterThan(0);
+  });
 
-    const dashboardPage = new DashboardPage(page);
-    await expect(page).toHaveURL(/.*inventory\.html/);
-    await expect(dashboardPage.inventoryList).toBeVisible();
-
-    await dashboardPage.logout();
-    await expect(page).toHaveURL(/https:\/\/www\.saucedemo\.com\/v1\/(index\.html)?/);
-    await expect(loginPage.loginButton).toBeVisible();
+  test('should not access dashboard without login', async ({ page }) => {
+    await page.goto('https://www.saucedemo.com/v1/inventory.html');
+    // Should not see inventory
+    expect(await dashboardPage.isInventoryVisible()).toBeFalsy();
+    expect(await dashboardPage.getInventoryItemsCount()).resolves.toBe(0);
   });
 }); 

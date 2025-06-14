@@ -1,14 +1,10 @@
-// Page Object for the Login Page
 class LoginPage {
-  /**
-   * @param {import('@playwright/test').Page} page
-   */
   constructor(page) {
     this.page = page;
-    this.usernameInput = page.locator('#user-name');
-    this.passwordInput = page.locator('#password');
-    this.loginButton = page.locator('#login-button');
-    this.errorMessage = page.locator('[data-test="error"]');
+    this.usernameInput = '#user-name';
+    this.passwordInput = '#password';
+    this.loginButton = '#login-button';
+    this.errorMessage = '[data-test="error"]';
   }
 
   async goto() {
@@ -16,13 +12,27 @@ class LoginPage {
   }
 
   async login(username, password) {
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
+    await this.page.fill(this.usernameInput, username);
+    await this.page.fill(this.passwordInput, password);
+    await this.page.click(this.loginButton);
+  }
+
+  async fillUsername(username) {
+    await this.page.fill(this.usernameInput, username);
+  }
+
+  async fillPassword(password) {
+    await this.page.fill(this.passwordInput, password);
+  }
+
+  async clickLogin() {
+    await this.page.click(this.loginButton);
   }
 
   async getErrorMessage() {
-    return this.errorMessage.textContent();
+    const isVisible = await this.page.isVisible(this.errorMessage);
+    if (!isVisible) return null;
+    return this.page.textContent(this.errorMessage);
   }
 }
 
